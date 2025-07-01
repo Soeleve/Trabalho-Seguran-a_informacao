@@ -21,9 +21,7 @@ Este projeto implementa um canal de comunicação segura entre um cliente e um s
 │   ├── ecdsa_pub_cliente.pem
 │   ├── ecdsa_priv_servidor.pem
 │   ├── ecdsa_pub_servidor.pem
-│   └── github_mock/
-│       ├── cliente.keys
-│       └── servidor.keys
+│   
 ```
 
 ## Como Executar
@@ -31,24 +29,24 @@ Este projeto implementa um canal de comunicação segura entre um cliente e um s
 1. **Gere as chaves ECDSA:**
 ```bash
 python gerador_chaves_ecdsa.py
-```
 
-2. **Inicie um servidor HTTP local para simular o GitHub:**
-```bash
-python -m http.server --directory chaves/github_mock 8000
 ```
+OBS.: as chaves publicas geradas "gerados_chaves_ecdasa" precisam estar hospedadas no site em https://gist.github.com/
 
-3. **Em outro terminal, execute o servidor seguro:**
+2. **Execute o servidor.py**
 ```bash
 python servidor.py
-```
 
-4. **Em outro terminal, execute o cliente:**
+```
+3. **Execute o cliente.py**
 ```bash
 python cliente.py
-```
 
-5. Digite uma mensagem no cliente e veja a mágica acontecer!
+```
+4. Digite uma mensagem no cliente e veja o resultado
+
+5. **Resultado**
+No terminal do servidor.py você podera visualizar a mensagem descriptografada 
 
 ## Tecnologias Usadas
 
