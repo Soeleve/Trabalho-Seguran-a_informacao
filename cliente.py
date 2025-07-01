@@ -1,4 +1,4 @@
-# cliente.py (FINAL)
+# cliente.py
 
 import socket
 import os
@@ -15,10 +15,9 @@ HOST = '127.0.0.1'
 PORT = 65432
 USERNAME_CLIENTE = 'cliente'
 
-# --- NOVO: Configuração do Servidor de Chaves Públicas ---
-USAR_GIST = False
+# Configuração do Servidor de Chaves Públicas ---
 URL_BASE_GIST = "https://gist.github.com/Soeleve/a424bc66836f71b88327cc7958ea138c/raw" # Ex: Use a sua URL base do Gist aqui
-URL_BASE_LOCAL = "http://127.0.0.1:8000"
+
 
 # --- Parâmetros Diffie-Hellman (DH) ---
 p = 0xFFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245E485B576625E7EC6F44C42E9A637ED6B0BFF5CB6F406B7EDEE386BFB5A899FA5AE9F24117C4B1FE649286651ECE45B3DC2007CB8A163BF0598DA48361C55D39A69163FA8FD24CF5F83655D23DCA3AD961C62F356208552BB9ED529077096966D670C354E4ABC9804F1746C08CA18217C32905E462E36CE3BE39E772C180E86039B2783A2EC07A28FB5C55DF06F4C52C9DE2BCBF6955817183995497CEA956AE515D2261898FA051015728E5A8AAAC42DAD33170D04507A33A85521ABDF1CBA64ECFB850458DBEF0A8AEA71575D060C7DB3970F85A6E1E4C7ABF5AE8CDB0933D71E8C94E04A25619DCEE3D2261AD2EE6BF12FFA06D98A0864D87602733EC86A64521F2B18177B200CBBE117577A615D6C770988C0BAD946E208E24FA074E5AB3143DB5BFCE0FD108E4B82D120A93AD2CAFFFFFFFFFFFFFFFF
@@ -41,10 +40,10 @@ def carregar_chave_privada_ecdsa(caminho):
     with open(caminho, 'rb') as f:
         return serialization.load_pem_private_key(f.read(), password=None)
 
-# NOVO: Função para baixar a chave pública de uma URL
+# Função para baixar a chave pública de uma URL
 def baixar_chave_publica_ecdsa(username):
     """Baixa e carrega a chave pública ECDSA de um usuário a partir de uma URL."""
-    base_url = URL_BASE_GIST if USAR_GIST else URL_BASE_LOCAL
+    base_url = URL_BASE_GIST
     url = f"{base_url}/{username}.keys"
     print(f"[Cliente] Baixando a chave pública do servidor de: {url}")
     
@@ -61,7 +60,7 @@ def baixar_chave_publica_ecdsa(username):
         return None
 
 def derivar_chaves(chave_mestra_dh):
-    # ... (código inalterado)
+   
     print("[Cliente] Derivando chaves AES e HMAC a partir do segredo DH...")
     kdf = PBKDF2HMAC(algorithm=hashes.SHA256(), length=TAMANHO_CHAVE_AES + TAMANHO_CHAVE_HMAC, salt=SALT, iterations=ITERACOES_PBKDF2)
     chaves_derivadas = kdf.derive(chave_mestra_dh)
@@ -71,11 +70,11 @@ def derivar_chaves(chave_mestra_dh):
     return key_aes, key_hmac
 
 def enviar_dados(sock, dados):
-    # ... (código inalterado)
+    
     sock.sendall(len(dados).to_bytes(4, 'big') + dados)
 
 def receber_dados(sock):
-    # ... (código inalterado)
+    
     tamanho_bytes = sock.recv(4)
     if not tamanho_bytes: return None
     tamanho = int.from_bytes(tamanho_bytes, 'big')
@@ -109,7 +108,7 @@ def main():
         assinatura_servidor = receber_dados(s)
         username_servidor = receber_dados(s).decode('utf-8')
         
-        # MODIFICADO: Usa a nova função para baixar a chave
+        # Usa a função para baixar a chave
         chave_publica_ecdsa_servidor = baixar_chave_publica_ecdsa(username_servidor)
         if not chave_publica_ecdsa_servidor:
             print("[Cliente] Abortando handshake.")
@@ -125,7 +124,7 @@ def main():
             print(f"[Cliente] ERRO: Assinatura do servidor INVÁLIDA! {e}")
             return
             
-        # O resto do fluxo continua como antes...
+        
         print("[Cliente] Calculando o segredo compartilhado (DH)...")
         chave_publica_dh_servidor = serialization.load_pem_public_key(chave_publica_dh_servidor_bytes)
         segredo_compartilhado = chave_privada_dh_cliente.exchange(chave_publica_dh_servidor)
