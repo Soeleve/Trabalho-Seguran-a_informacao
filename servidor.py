@@ -1,4 +1,4 @@
-# servidor.py
+# servidor.py (FINAL)
 
 import socket
 import os
@@ -17,8 +17,11 @@ PORT = 65432
 USERNAME_SERVIDOR = 'servidor'
 
 # Configuração do Servidor de Chaves Públicas ---
+# Mude para True para usar URLs reais do GitHub Gist (preencha a URL_BASE_GIST)
+# Mude para False para usar o servidor local (recomendado para teste)
+USAR_GIST = True
 URL_BASE_GIST = "https://gist.github.com/Soeleve/a424bc66836f71b88327cc7958ea138c/raw" # Ex: Use a sua URL base do Gist aqui
-
+URL_BASE_LOCAL = "http://127.0.0.1:8000"
 
 # --- Parâmetros Diffie-Hellman (DH) ---
 p = 0xFFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245E485B576625E7EC6F44C42E9A637ED6B0BFF5CB6F406B7EDEE386BFB5A899FA5AE9F24117C4B1FE649286651ECE45B3DC2007CB8A163BF0598DA48361C55D39A69163FA8FD24CF5F83655D23DCA3AD961C62F356208552BB9ED529077096966D670C354E4ABC9804F1746C08CA18217C32905E462E36CE3BE39E772C180E86039B2783A2EC07A28FB5C55DF06F4C52C9DE2BCBF6955817183995497CEA956AE515D2261898FA051015728E5A8AAAC42DAD33170D04507A33A85521ABDF1CBA64ECFB850458DBEF0A8AEA71575D060C7DB3970F85A6E1E4C7ABF5AE8CDB0933D71E8C94E04A25619DCEE3D2261AD2EE6BF12FFA06D98A0864D87602733EC86A64521F2B18177B200CBBE117577A615D6C770988C0BAD946E208E24FA074E5AB3143DB5BFCE0FD108E4B82D120A93AD2CAFFFFFFFFFFFFFFFF
@@ -44,7 +47,7 @@ def carregar_chave_privada_ecdsa(caminho):
 # Função para baixar a chave pública de uma URL
 def baixar_chave_publica_ecdsa(username):
     """Baixa e carrega a chave pública ECDSA de um usuário a partir de uma URL."""
-    base_url = URL_BASE_GIST
+    base_url = URL_BASE_GIST if USAR_GIST else URL_BASE_LOCAL
     url = f"{base_url}/{username}.keys"
     print(f"[Servidor] Baixando a chave pública do cliente de: {url}")
     
@@ -104,7 +107,7 @@ def main():
             assinatura_cliente = receber_dados(conn)
             username_cliente = receber_dados(conn).decode('utf-8')
 
-            # Usa a função para baixar a chave
+            # Usa função para baixar a chave
             chave_publica_ecdsa_cliente = baixar_chave_publica_ecdsa(username_cliente)
             if not chave_publica_ecdsa_cliente:
                 print("[Servidor] Abortando handshake.")
